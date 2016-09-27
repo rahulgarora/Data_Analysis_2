@@ -1,0 +1,167 @@
+---
+title: "Data Analysis"
+author: "Rahul"
+date: "September 26, 2016"
+output: html_document
+fig.width: 900
+---
+
+# 900K observations extracted randomly.Below is the summary and Glimpse of the Data.
+```{r summary, echo=FALSE, warning=FALSE, message=FALSE, fig.width=900}
+library(ggplot2)
+library(gridExtra)
+library(tidyr)
+library(dplyr)
+df_train_random <- read.csv('C:\\Users\\rahuaror\\Documents\\Rahul\\SpingBoard\\HugeDataSet\\train_random.csv')
+
+# Summary of Data
+summary(df_train_random)
+glimpse (df_train_random)
+
+```
+
+
+## Feature of Interest **"Adjusted Demand".**
+#### Looking at its distribution using a log scale on the x axis since data seems skewed.
+######Warning - Removed 16187 rows containing non-finite values (stat_bin).
+######There are 16187 occurences of Zero(0) which were removed.
+```{r plots-histogram, echo=FALSE, warning=FALSE, message=FALSE}
+
+ggplot(data = df_train_random, aes( x = Adjusted_Demand ) ) +  
+  geom_histogram( bins = 30 ) +scale_x_log10()
+
+```
+
+## Using **_Box-Plot_** to see the **Outliers**
+######Warning : Removed 16187 rows containing non-finite values (stat_boxplot).
+```{r box, echo=FALSE, warning=FALSE, message=FALSE }
+ggplot(data = df_train_random, aes( x = 1, y = Adjusted_Demand ) ) +  
+  geom_boxplot()   +scale_y_log10()
+
+```
+
+### As per observation **Adjusted Demand** > 10 has outliers, hence taking a subset of the data.
+
+```{r subset, warning=FALSE, message=FALSE}
+
+# Taking a subset of Demand less than 10
+df_train_random_subset <- subset(df_train_random, Adjusted_Demand < 10 )
+
+```
+
+### **Adjusted Demand** subset data's **_Box-Plot_** and **_Summary_**
+```{r sub-box, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
+ggplot(data = df_train_random_subset, aes( x = 1, y = Adjusted_Demand ) ) +  
+  geom_boxplot()   +scale_y_log10()
+
+summary(df_train_random_subset$Adjusted_Demand)
+
+```
+
+## Observe Relationship between **Adjusted Demand** and **other Features** 
+
+###Relation between **Product ID** and **Adjusted Demand**
+###### Used subset data of Adjusted Demand
+```{r plots-product, warning=FALSE, message=FALSE, cache=TRUE}
+#See outliers in Product ID
+ggplot(data = df_train_random_subset, aes( x = 1, y = Product_ID ) ) +  
+  geom_boxplot() +scale_y_log10()
+
+
+# Scatter Plot distribution between Adjusted Demand and Product ID colored by Week.
+ggplot(data = df_train_random_subset, aes( x = Product_ID, y = Adjusted_Demand ) ) +  
+             geom_jitter(aes(colour = factor(Week_number)))
+
+```
+
+###Relation between **Client ID** and **Adjusted Demand**
+###### Used subset data of Adjusted Demand
+
+```{r plots-client, warning=FALSE, message=FALSE, cache=TRUE}
+# See Outliers in Client ID
+ggplot(data = df_train_random_subset, aes( x = 1, y = Client_ID ) ) +  
+  geom_boxplot() +scale_y_log10()
+
+# Scatter Plot distribution between Adjusted Demand and Client ID colored by Week.
+ggplot(data = df_train_random_subset, aes( x = Client_ID, y = Adjusted_Demand ) ) +  
+             geom_jitter(aes(colour = factor(Week_number)))
+```
+
+### Relation between **Sales unit this week** and **Adjusted Demand**
+######Warning: Removed 3620 rows containing non-finite values (stat_boxplot).
+```{r plots-SalesUnit, warning=FALSE, message=FALSE, cache=TRUE}
+# See Outliers in Sales Unit
+ggplot(data = df_train_random_subset, aes( x = 1, y = Sales_unit_this_week ) ) +  
+  geom_boxplot() +scale_y_log10()
+
+# Scatter Plot distribution between Adjusted Demand and Sales Unit colored by Week.
+ggplot(data = df_train_random_subset, aes( x = Sales_unit_this_week, y = Adjusted_Demand ) ) +  
+             geom_jitter(aes(colour = factor(Week_number)))
+
+```
+
+### Relation between **Returns unit next week** and **Adjusted Demand**
+###### Warning: Removed 714155 rows containing non-finite values (stat_boxplot)
+```{r plots-ReturnsUnit, warning=FALSE, message=FALSE, cache=TRUE}
+# See Outliers in Returns Unit
+ggplot(data = df_train_random_subset, aes( x = 1, y = Returns_unit_next_week ) ) +  
+  geom_boxplot() +scale_y_log10()
+
+# Scatter Plot distribution between Adjusted Demand and Returns Unit colored by Week.
+ggplot(data = df_train_random_subset, aes( x = Returns_unit_next_week, y = Adjusted_Demand ) ) +  
+             geom_jitter(aes(colour = factor(Week_number)))
+
+```
+
+### Relation between **Route ID** and **Adjusted Demand**
+```{r plots-RouteID, warning=FALSE, message=FALSE, cache=TRUE}
+# See Outliers in Route ID
+ggplot(data = df_train_random_subset, aes( x = 1, y = Route_ID ) ) +  
+  geom_boxplot() +scale_y_log10()
+
+# Scatter Plot distribution between Adjusted Demand and Route ID colored by Week.
+ggplot(data = df_train_random_subset, aes( x = Route_ID, y = Adjusted_Demand ) ) +  
+             geom_jitter(aes(colour = factor(Week_number)))
+
+```
+
+### Relation between **Sales Channel ID** and **Adjusted Demand**
+```{r plots-SalesChannel, warning=FALSE, message=FALSE, cache=TRUE}
+# See Outliers in Sales Channel ID
+ggplot(data = df_train_random_subset, aes( x = 1, y = Sales_Channel_ID ) ) +  
+  geom_boxplot() +scale_y_log10()
+
+# Scatter Plot distribution between Adjusted Demand and Sales Channel ID colored by Week.
+ggplot(data = df_train_random_subset, aes( x = Sales_Channel_ID, y = Adjusted_Demand ) ) +  
+             geom_jitter(aes(colour = factor(Week_number)))
+
+# Scatter Plot distribution between Adjusted Demand and Week number colored by Sales Channel ID
+ggplot(data = df_train_random_subset, aes( x = Week_number, y = Adjusted_Demand ) ) +  
+             geom_jitter(aes(colour = factor(Sales_Channel_ID)))
+
+```
+
+### Relation between **Sales Depot ID** and **Adjusted Demand**
+```{r plots-Salesdepot, warning=FALSE, message=FALSE, cache=TRUE}
+# See Outliers in Sales Depot ID
+ggplot(data = df_train_random_subset, aes( x = 1, y = Sales_Depot_ID ) ) +  
+  geom_boxplot() +scale_y_log10()
+
+# Scatter Plot distribution between Adjusted Demand and Sales Depot ID colored by Week.
+ggplot(data = df_train_random_subset, aes( x = Sales_Depot_ID, y = Adjusted_Demand ) ) +  
+             geom_jitter(aes(colour = factor(Week_number)))
+
+
+```
+
+### Relation between **Week number** and **Adjusted Demand**
+```{r plots-week, warning=FALSE, message=FALSE, cache=TRUE}
+# See Outliers in Week number
+ggplot(data = df_train_random_subset, aes( x = 1, y = Week_number ) ) +  
+  geom_boxplot() +scale_y_log10()
+
+# Scatter Plot distribution between Adjusted Demand and Week number.
+ggplot(data = df_train_random_subset, aes( x = Week_number, y = Adjusted_Demand ) ) +  
+             geom_jitter()
+
+```
