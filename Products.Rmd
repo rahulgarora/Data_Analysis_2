@@ -1,0 +1,85 @@
+---
+title: "Products"
+author: "Rahul"
+date: "October 5, 2016"
+output: html_document
+---
+
+# Summary of Data.
+```{r summary, echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+library(gridExtra)
+library(tidyr)
+library(dplyr)
+df_train_random <- read.csv('C:\\Users\\rahuaror\\Documents\\Rahul\\SpingBoard\\HugeDataSet\\train_random.csv')
+
+## Summary of Data
+summary(df_train_random)
+
+```
+
+## Frequency (Occurence) of Product ids sorted descending
+```{r Product, echo=FALSE, warning=FALSE}
+
+Prod_freq <- as.data.frame(table(df_train_random$Product_ID))
+
+## Products Frequency
+ggplot(Prod_freq, aes(x= reorder(factor(Var1), -Freq), y = Freq))+
+      geom_bar(stat="identity")+
+      scale_x_discrete("Product_ID") + scale_y_log10() +
+      theme(axis.text.x=element_blank(),
+            axis.ticks.x=element_blank())
+```
+
+## Product Summary, 
+###Each Product's Mean/Median/1st Quartile/3rd Quartile for Adjusted Demand, sorted descending by Frequncy
+```{r Prod_summary, echo=FALSE, warning=FALSE}
+                 
+Products_summary <- df_train_random %>% group_by(Product_ID) %>%
+                    summarise(  Freq = n(),
+                    Sales_Unit = sum(Sales_unit_this_week),
+                    Mean_AD = mean(Adjusted_Demand),
+                    Median_AD = median(Adjusted_Demand),
+                    Quartile_1 = quantile(Adjusted_Demand, 0.25),
+                    Quartile_3 = quantile(Adjusted_Demand, 0.75)) %>%
+                    arrange(desc(Mean_AD))
+
+glimpse(Products_summary)
+
+
+grid.arrange(ggplot(Products_summary, aes (x= reorder(factor(as.character(Product_ID)), -Freq)))+
+      geom_point(aes(y = Mean_AD), col = "blue", alpha = 0.5)+
+      scale_x_discrete(names("Product_ID")) +
+      theme(axis.text.x=element_blank(),
+            axis.ticks.x=element_blank()), 
+      ggplot(Products_summary, aes (x= reorder(factor(as.character(Product_ID)), -Freq)))+
+      geom_point(aes(y = Median_AD), col = "red", alpha = 0.5)+
+      scale_x_discrete(names("Product_ID")) +
+      theme(axis.text.x=element_blank(),
+            axis.ticks.x=element_blank()), 
+      ggplot(Products_summary, aes (x= reorder(factor(as.character(Product_ID)), -Freq)))+
+      geom_point(aes(y = Quartile_1), col = "coral4", alpha = 0.5)+
+      scale_x_discrete(names("Product_ID")) +
+      theme(axis.text.x=element_blank(),
+            axis.ticks.x=element_blank()),
+       ggplot(Products_summary, aes (x= reorder(factor(as.character(Product_ID)), -Freq)))+
+      geom_point(aes(y = Quartile_3), col = "purple", alpha = 0.5)+
+      scale_x_discrete(names("Product_ID")) +
+      theme(axis.text.x=element_blank(),
+            axis.ticks.x=element_blank()), ncol = 2, nrow = 2)
+      
+```
+
+### As per above charts, there are some Product ids with very Low frequency(occurence) and very high Mean/Median.
+
+```{r freq, echo=FALSE, warning=FALSE}
+
+head(arrange(Products_summary, desc(-Freq)))
+```
+
+### There are some Product ids with very high frequency(occurence) and low Mean/Median values.
+
+```{r freq_2, echo=FALSE, warning=FALSE}
+
+tail(arrange(Products_summary, desc(-Freq)))
+```
